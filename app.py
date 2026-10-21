@@ -4,6 +4,8 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from pathlib import Path
+
 # 1. 화면 기본 설정
 st.set_page_config(
     page_title="철도 데이터 분석 대시보드",
@@ -101,18 +103,16 @@ def show_table(data, height=280):
     )
 
 
-# 3. 데이터 읽기
-DATA_PATH = "/content/analysis_result.csv"
+# 3. 데이터 읽기: 앱 파일과 같은 폴더의 CSV 사용
+DATA_PATH = Path(__file__).resolve().parent / "analysis_result.csv"
+
 try:
     df = pd.read_csv(DATA_PATH)
 except FileNotFoundError:
-    st.error(f"데이터 파일을 찾을 수 없습니다. {DATA_PATH} 경로를 확인하세요.")
-    st.stop()
-
-required = ["설비ID", "측정시각", "목표시각", "온도_C", "AI결과", "다음온도_C", "AI예측온도_C"]
-missing = [column for column in required if column not in df.columns]
-if missing:
-    st.error("데이터에 필요한 열이 없습니다: " + ", ".join(missing))
+    st.error(
+        "analysis_result.csv 파일을 찾을 수 없습니다. "
+        "app_06.py와 같은 폴더에 CSV 파일을 함께 배포하세요."
+    )
     st.stop()
 
 df["측정시각"] = pd.to_datetime(df["측정시각"], errors="coerce")
